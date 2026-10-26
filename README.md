@@ -370,10 +370,6 @@ The frontend image already serves through nginx and proxies API requests to the 
 
 ## Troubleshooting
 
-### Port 5432, 3000, or 8080 is already in use
-
-Stop the conflicting process or change the published port in `docker-compose.yml`. Internal container ports should remain unchanged.
-
 ### The owner password changed but login still uses the old password
 
 Run the seed again so it updates the bcrypt hash:
