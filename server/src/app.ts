@@ -1,4 +1,6 @@
 import { randomUUID } from 'node:crypto';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
@@ -70,5 +72,23 @@ app.get('/health/ready', async (_req, res) => {
 
 app.use('/api/v1', publicRoutes);
 app.use('/api/v1/owner', ownerRoutes);
+
+if (env.NODE_ENV === 'production') {
+  const clientDist = path.resolve(__dirname, '../../client/dist');
+  const clientIndex = path.join(clientDist, 'index.html');
+
+  if (!existsSync(clientIndex)) {
+    logger.warn(
+      { event: 'frontend.assets_missing', clientDist },
+      'React production build was not found; API routes remain available',
+    );
+  } else {
+    app.use(express.static(clientDist));
+    app.get('*', (_req, res) => {
+      res.sendFile(clientIndex);
+    });
+  }
+}
+
 app.use(notFoundHandler);
 app.use(errorHandler);

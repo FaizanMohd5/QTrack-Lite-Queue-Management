@@ -239,6 +239,7 @@ Never use the sample password or session secret in production.
 |---|---|
 | `npm run dev` | Start Express and Vite in watch mode. |
 | `npm run build` | Create production server and client builds. |
+| `npm run start:production` | Apply migrations, seed shop configuration, and start the single-service production app. |
 | `npm run typecheck` | Type-check both workspaces. |
 | `npm run lint` | Lint both workspaces. |
 | `npm test` | Run unit tests; DB tests remain skipped unless enabled. |
@@ -366,7 +367,7 @@ Before a real deployment:
 - Confirm `/health/ready` through the platform health check.
 - Retain structured logs while applying an appropriate privacy and retention policy.
 
-The frontend image already serves through nginx and proxies API requests to the Compose service. For split-host deployment, configure the frontend host to proxy `/api` to the API or add an explicit frontend API base URL.
+In production, Express serves the compiled React application and the `/api` routes from the same origin. Direct visits and refreshes on `/dashboard` and `/q/:shopSlug` fall back to the React entry point. Run `npm run build` before `npm run start:production`.
 
 ## Troubleshooting
 
