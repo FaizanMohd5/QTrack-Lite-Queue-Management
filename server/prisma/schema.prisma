@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum QueueEntryStatus {
+  WAITING
+  SERVING
+  DONE
+  NO_SHOW
+}
+
+model Shop {
+  id                String     @id @default(cuid())
+  slug              String     @unique
+  name              String
+  timezone          String     @default("Asia/Kolkata")
+  ownerPasswordHash String
+  isQueueOpen       Boolean    @default(true)
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  queueDays         QueueDay[]
+}
+
+model QueueDay {
+  id              String       @id @default(cuid())
+  shopId          String
+  serviceDate     DateTime     @db.Date
+  lastTokenNumber Int          @default(0)
+  createdAt       DateTime     @default(now())
+  shop            Shop         @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  entries         QueueEntry[]
+
+  @@unique([shopId, serviceDate])
+  @@index([shopId, serviceDate])
+}
+
+model QueueEntry {
+  id              String           @id @default(cuid())
+  publicTokenHash String           @unique
+  queueDayId      String
+  tokenNumber     Int
+  name            String
+  phone           String
+  normalizedPhone String
+  status          QueueEntryStatus @default(WAITING)
+  createdAt       DateTime         @default(now())
+  calledAt        DateTime?
+  completedAt     DateTime?
+  queueDay        QueueDay         @relation(fields: [queueDayId], references: [id], onDelete: Cascade)
+
+  @@unique([queueDayId, tokenNumber])
+  @@index([queueDayId, status, createdAt])
+  @@index([queueDayId, normalizedPhone, status])
+}

@@ -1,0 +1,17 @@
+node_modules
+**/node_modules
+.npm-cache
+.tmp
+tmp
+temp
+dist
+**/dist
+coverage
+.git
+.env
+.env.*
+!.env.example
+*.log
+*.tsbuildinfo
+.idea
+.vscode
